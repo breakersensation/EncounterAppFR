@@ -1,0 +1,25 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import CharacterCreate from '../pages/CharacterCreate.vue'
+import CharacterSheet from '../pages/CharacterSheet.vue'
+
+const routes = [
+    {
+        path: '/',
+        redirect: '/characters/new',
+    },
+    {
+        path: '/characters/new',
+        component: CharacterCreate,
+    },
+    {
+        path: '/characters/:id',
+        component: CharacterSheet,
+    }
+]
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+})
+
+export default router

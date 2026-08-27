@@ -1,0 +1,19 @@
+{
+    "name": "stfirebringer/encounter-app-fr",
+    "description": "encMgrPkg",
+    "authors": [
+        {
+            "name": "Breaker Sensation",
+            "email": "breakersensation@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/database": "^10.49",
+        "illuminate/events": "^10.49"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "backend/"
+        }
+    }
+}

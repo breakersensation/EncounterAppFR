@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd /home/stfirebringer/EncounterAppFR/backend && php test\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
