@@ -5,6 +5,16 @@ use App\Controllers\ClassController;
 $method = $_SERVER['REQUEST_METHOD'];
 $uri = $_SERVER['REQUEST_URI'];
 
+//AUTH ROUTES
+
+if($method === 'POST' && preg_match('#^/api/auth/login$#', $uri)){
+    $controller = new App\Controllers\AuthController();
+    $controller->login();
+    exit;
+}
+
+//CHARACTER ROUTES
+
 if (
     $method === 'GET' 
     && preg_match(
@@ -43,10 +53,6 @@ if($method === 'POST' && preg_match('#^/api/characters$#', $uri)){
     $controller->store();
 }
 
-if($method === 'GET' && preg_match('#^/api/characters/(\d+)$#', $uri, $matches)){
-    $controller = new App\Controllers\CharacterController();
-    $controller->show($matches[1]);
-}
 if($method === 'PATCH' && preg_match('#^/api/characters/(\d+)$#', $uri, $matches)){
     $controller = new App\Controllers\CharacterController();
     $controller->update($matches[1]);

@@ -87,6 +87,8 @@ import { getClasses } from '../api/classApi'
 import { getBackgrounds } from '../api/backgroundApi'
 import { createCharacter } from '../api/characterApi'
 import AbilityScore from '../components/AbilityScore.vue'
+//temp
+import { login } from '../api/authApi.js'
 
 const abilities = [
   {key: 'str_score', label: 'Strength'},
@@ -125,7 +127,13 @@ onMounted(async () => {
   species.value = await getSpecies();
   classes.value = await getClasses();
   backgrounds.value = await getBackgrounds();
-})
+  try {
+    const response = await login('test@example.com', 'super-secret-password')
+    console.log(response)
+  } catch (error) {
+    console.error('Login failed:', error)
+  }
+});
 
 async function saveCharacter(){
   if(!characterTraits.name){
