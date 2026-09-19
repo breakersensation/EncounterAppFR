@@ -10,6 +10,14 @@ use App\Models\CharacterClass;
 class CharacterController
 {
     public function show(int $id){
+
+        session_start();
+
+        if(!isset($_SESSION['user_id'])){
+            http_response_code(401);
+            echo json_encode([   'error' => 'Unauthorized'   ]);
+            return;
+        }
         $character = Character::with([
             'race',
             'background',
