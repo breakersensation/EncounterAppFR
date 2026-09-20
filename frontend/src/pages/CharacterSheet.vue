@@ -1,4 +1,7 @@
 <template>
+  <h1 v-if="errorMessage">
+    {{ errorMessage }}
+  </h1>
   <form @submit.prevent="saveCharacter">
     <div v-if="characterData">
       <h1>Character Sheet</h1>
@@ -32,11 +35,12 @@
 
 <script setup>
 import { computed, onMounted, ref, reactive } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getCharacter, updateCharacter } from '../api/characterApi'
 import AbilityScore from '../components/AbilityScore.vue'
 
 const route = useRoute();
+const router = useRouter();
 
 const characterId = route.params.id;
 const characterData = reactive({
@@ -65,14 +69,30 @@ const abilities = [
   {key: 'wis_score', label: 'Wisdom'},
   {key: 'cha_score', label: 'Charisma'},
 ];
+const errorMessage = ref('');
 
 onMounted(async () => {
   // characterData.value = await getCharacter(characterId)
-  const data = await getCharacter(characterId);
-  Object.assign(characterData, data);
-  console.log('Character Data:');
-  console.log(characterData);
-  console.log(characterData.name);
+  try {
+      const data = await getCharacter(characterId);
+      Object.assign(characterData, data);
+      console.log('Character Data:');
+      console.log(characterData);
+      console.log(characterData.name);
+  } catch (error) {
+      console.log('Error fetching character data:');
+      console.log(error);
+      if(error.response?.status === 401){
+        errorMessage.value = "You're ain't logged in, shithead!!!";
+        
+        router.push('/login');
+        return;
+      } else {
+        errorMessage.value = 'Unable to load character.';
+      }
+      
+  }
+
 });
 
 async function saveCharacter() {
