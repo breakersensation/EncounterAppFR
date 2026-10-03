@@ -6,18 +6,14 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use App\Models\Character;
 use App\Models\CharacterState;
 use App\Models\CharacterClass;
+use App\Controllers\AuthController;
 
 class CharacterController
 {
     public function show(int $id){
 
-        session_start();
+        $userId = AuthController::requireLogin();
 
-        if(!isset($_SESSION['user_id'])){
-            http_response_code(401);
-            echo json_encode([   'error' => 'Unauthorized'   ]);
-            return;
-        }
         $character = Character::with([
             'race',
             'background',
@@ -26,12 +22,21 @@ class CharacterController
             'classes.classDefinition'
         ])->find($id);
 
+        if($character->user_id !== $userId){
+            http_response_code(403);
+            echo json_encode([   'error' => 'Forbidden - user: ' . $userId . ' does not own this character: ' . $character->user_id   ]);
+            return;
+        }
+
         header('Content-Type: application/json');
 
         echo json_encode($character, JSON_PRETTY_PRINT);
     }
 
     public function store(){
+        //require login
+        $userId = AuthController::requireLogin();
+
         $input = json_decode(file_get_contents('php://input'), true);
 
         //validation
@@ -42,9 +47,9 @@ class CharacterController
         }
 
         //save
-        $character = Capsule::connection()->transaction(function () use ($input){
+        $character = Capsule::connection()->transaction(function () use ($input, $userId) {
             $character = Character::create([
-                'user_id' => 1,
+                'user_id' => $userId,
                 'name' => $input['name'],
                 'race_id' => $input['singularSpeciesId'],
                 'background_id' => $input['backgroundId'],
@@ -77,6 +82,9 @@ class CharacterController
     }
 
      public function update(int $id){
+        //require login
+        $userId = AuthController::requireLogin();
+        
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
          //validation
@@ -93,13 +101,18 @@ class CharacterController
             return;
         }
 
+        if($character->user_id !== $userId){
+            http_response_code(403);
+            echo json_encode([   'error' => 'Forbidden - user does not own this character'   ]);
+            return;
+        }
+
         $backgroundId = $input['backgroundId'] ?? null;
         if($backgroundId === ''){
             $backgroundId = $character->background_id;
         }
 
         $character->update([
-            'user_id' => 1,
             'name' => $input['name'],
             // 'race_id' => $input['singularSpeciesId'] ?? $character->race_id,
             'race_id' => $character->race_id,
