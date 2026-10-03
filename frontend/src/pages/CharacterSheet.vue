@@ -83,7 +83,7 @@ onMounted(async () => {
       console.log('Error fetching character data:');
       console.log(error);
       if(error.response?.status === 401){
-        errorMessage.value = "You're ain't logged in, shithead!!!";
+        errorMessage.value = "You ain't logged in, shithead!!!";
         
         router.push('/login');
         return;

@@ -52,8 +52,27 @@ class AuthController
                 'email' => $user->email,
             ],
         ]);
+    }
 
+    public static function userId(): ?int {
+        session_start();
 
+        return $_SESSION['user_id'] ?? null;
+    }
 
+    public static function requireLogin(): int {
+        $userId = self::userId();
+
+        if ($userId === null) {
+            http_response_code(401);
+
+            echo json_encode([
+                'error' => 'Unauthorized user'
+            ]);
+
+            exit;
+        }
+
+        return $userId;
     }
 }
