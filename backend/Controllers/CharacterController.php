@@ -8,11 +8,10 @@ use App\Models\CharacterState;
 use App\Models\CharacterClass;
 use App\Controllers\AuthController;
 
-class CharacterController
+class CharacterController extends AuthenticatedController
 {
     public function show(int $id){
 
-        $userId = AuthController::requireLogin();
 
         $character = Character::with([
             'race',
@@ -22,9 +21,9 @@ class CharacterController
             'classes.classDefinition'
         ])->find($id);
 
-        if($character->user_id !== $userId){
+        if($character->user_id !== $this->userId){
             http_response_code(403);
-            echo json_encode([   'error' => 'Forbidden - user: ' . $userId . ' does not own this character: ' . $character->user_id   ]);
+            echo json_encode([   'error' => 'Forbidden - user: ' . $this->userId . ' does not own this character: ' . $character->user_id   ]);
             return;
         }
 
@@ -35,7 +34,6 @@ class CharacterController
 
     public function store(){
         //require login
-        $userId = AuthController::requireLogin();
 
         $input = json_decode(file_get_contents('php://input'), true);
 
@@ -47,9 +45,9 @@ class CharacterController
         }
 
         //save
-        $character = Capsule::connection()->transaction(function () use ($input, $userId) {
+        $character = Capsule::connection()->transaction(function () use ($input) {
             $character = Character::create([
-                'user_id' => $userId,
+                'user_id' => $this->userId,
                 'name' => $input['name'],
                 'race_id' => $input['singularSpeciesId'],
                 'background_id' => $input['backgroundId'],
@@ -83,7 +81,6 @@ class CharacterController
 
      public function update(int $id){
         //require login
-        $userId = AuthController::requireLogin();
         
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
@@ -101,7 +98,7 @@ class CharacterController
             return;
         }
 
-        if($character->user_id !== $userId){
+        if($character->user_id !== $this->userId){
             http_response_code(403);
             echo json_encode([   'error' => 'Forbidden - user does not own this character'   ]);
             return;
