@@ -19,3 +19,9 @@ export async function updateCharacter(id, character){
 
     return response.data;
 }
+
+export async function getCharacterList(){
+    const response = await axios.get(`${apiBaseUrl}/api/getCharacters`);
+
+    return response.data;
+}

@@ -100,7 +100,7 @@ async function saveCharacter() {
     alert('Character name is required');
     return;
   }
-
+  console.log(characterData);
   const updated = await updateCharacter(characterId, characterData);
   console.log('Updated Character:');
   console.log(updated);

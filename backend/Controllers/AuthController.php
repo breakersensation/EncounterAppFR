@@ -75,4 +75,18 @@ class AuthController
 
         return $userId;
     }
+
+    public function logout(): void {
+        session_start();
+
+        $_SESSION = [];
+
+        session_destroy();
+
+        header('Content-Type: application/json');
+
+        echo json_encode([
+            'message' => 'Logout success!!!'
+        ]);
+    }
 }
