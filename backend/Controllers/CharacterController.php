@@ -91,16 +91,13 @@ class CharacterController extends AuthenticatedController
             return;
         }
 
-        $character = Character::find($id);
+        $character = Character::where('id', $id)
+            ->where('user_id', $this->userId)
+            ->first();
+
         if(!$character){
             http_response_code(404);
             echo json_encode(['error' => 'Character not found']);
-            return;
-        }
-
-        if($character->user_id !== $this->userId){
-            http_response_code(403);
-            echo json_encode([   'error' => 'Forbidden - user does not own this character'   ]);
             return;
         }
 
@@ -136,6 +133,20 @@ class CharacterController extends AuthenticatedController
 
      }
 
+     public function characterList() {
+        $characters = Character::with([
+            'race:id,name',
+            'classes:id,character_id,class_id',
+            'classes.classDefinition:id,name',
+        ])->where('user_id', $this->userId)
+        ->orderBy('name', 'asc')
+        ->get();
+
+        header('Content-Type: application/json');
+
+        echo json_encode($characters, JSON_PRETTY_PRINT);
+     }
+
     public function races(){
         $races = Capsule::table('races')->get();
 
@@ -145,7 +156,7 @@ class CharacterController extends AuthenticatedController
     }
 
     public function backgrounds(){
-        $backgrounds = Capsule::class('backgrounds')->get();
+        $backgrounds = Capsule::table('backgrounds')->get();
 
         header('Content-Type: application/json');
 
@@ -153,7 +164,7 @@ class CharacterController extends AuthenticatedController
     }
 
     public function classes(){
-        $classes = Capsule::class('classes')->get();
+        $classes = Capsule::table('classes')->get();
 
         header('Content-Type: application/json');
 

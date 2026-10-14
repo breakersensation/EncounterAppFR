@@ -51,10 +51,23 @@ if($method === 'GET' && preg_match('#^/api/backgrounds$#', $uri)){
 if($method === 'POST' && preg_match('#^/api/characters$#', $uri)){
     $controller = new App\Controllers\CharacterController();
     $controller->store();
+    exit;
 }
 
 if($method === 'PATCH' && preg_match('#^/api/characters/(\d+)$#', $uri, $matches)){
     $controller = new App\Controllers\CharacterController();
     $controller->update($matches[1]);
+    exit;
+}
+
+if($method === 'GET' && preg_match('#^/api/getCharacters$#', $uri)){
+    $controller = new App\Controllers\CharacterController();
+    $controller->characterList();
+    exit;
+}
+
+if($method === 'POST' && preg_match('#^/api/auth/logout$#', $uri)){
+    $controller = new App\Controllers\AuthController();
+    $controller->logout();
     exit;
 }
